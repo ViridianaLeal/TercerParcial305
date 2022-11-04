@@ -1,6 +1,8 @@
 package dao;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import Conexion.conexion;
 import modelo.Usuario;
@@ -26,5 +28,26 @@ public class daoUsuario {
 			return false;
 		}
 		
+	}
+	public ArrayList<Usuario>fetchUsuarios(){
+		ArrayList<Usuario>lista = new ArrayList<Usuario>();
+		PreparedStatement ps = null;
+		ResultSet rs= null;
+        try {
+			ps= cx.conectar().prepareStatement("SELECT *FROM usuario");
+            rs = ps.executeQuery();
+            while(rs.next()) {
+            	Usuario u = new Usuario();
+            	u.setId(rs.getInt("id"));
+            	u.setUser(rs.getString("user"));
+            	u.setPassword(rs.getString("password"));
+            	u.setNombre(rs.getString("nombre"));
+            	lista.add(u);
+            }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return lista;
 	}
 }

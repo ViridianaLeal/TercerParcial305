@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.swing.JButton;
 import java.awt.Font;
 import javax.swing.border.BevelBorder;
@@ -20,6 +21,7 @@ import dao.daoUsuario;
 import modelo.Usuario;
 
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 public class vUsuario extends JFrame {
@@ -36,10 +38,10 @@ public class vUsuario extends JFrame {
 	private JButton btnBorrar;
 	private JScrollPane scrollPane;
 	daoUsuario dao=new daoUsuario();
+	DefaultTableModel modelo = new  DefaultTableModel();
+	ArrayList<Usuario>lista= new ArrayList<Usuario>();
 
-	/**
-	 * Launch the application.
-	 */
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -115,6 +117,7 @@ public class vUsuario extends JFrame {
 					user.setPassword(txtPassword.getText());
 					user.setNombre(txtNombre.getText());
 					if(dao.insertarUsuario(user)) {
+						actualizarTabla();
 						JOptionPane.showMessageDialog(null, "SE AGREGO CORRECTAMENTE");
 					}else {
 						JOptionPane.showMessageDialog(null, "ERROR");
@@ -123,6 +126,8 @@ public class vUsuario extends JFrame {
 					JOptionPane.showMessageDialog(null, "ERROR");
 				}
 			}
+			
+			
 		});
 		btnAgregar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnAgregar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
@@ -163,5 +168,26 @@ public class vUsuario extends JFrame {
 			}
 		));
 		scrollPane.setViewportView(tblUsuarios);
+		
+		modelo.addColumn("ID");
+		modelo.addColumn("USER");
+		modelo.addColumn("PASSWORD");
+		modelo.addColumn("NOMBRE");
+		tblUsuarios.setModel(modelo);
+	}
+	public void actualizarTabla() {
+		while(modelo.getRowCount()>0) {
+			modelo.removeRow(0);
+		}
+		lista=dao.fetchUsuarios();
+		for(Usuario u: lista ) {
+			Object o []= new Object[4];
+			o[0]= u.getId();
+			o[1]= u.getUser();
+			o[2]= u.getPassword();
+			o[3]= u.getNombre();
+			modelo.addRow(o);
+		}
+		tblUsuarios.setModel(modelo);
 	}
 }
