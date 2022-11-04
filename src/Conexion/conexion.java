@@ -10,8 +10,8 @@ public class conexion {
 	public Connection conectar() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			cx = DriverManager.getConnection("jdbc:sqlite: sistema.db");
-			System.out.print("Conexion exitosa");
+			cx = DriverManager.getConnection("jdbc:sqlite:sistema.db");
+			System.out.print("Conexión exitosa");
 
 		} catch (ClassNotFoundException | SQLException e) {
 
