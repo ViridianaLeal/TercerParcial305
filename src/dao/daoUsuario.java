@@ -20,9 +20,11 @@ public class daoUsuario {
 		PreparedStatement ps=null;
 		try {
 			ps=cx.conectar().prepareStatement("INSERT INTO usuario VALUES(null,?,?,?)");
-			ps.setString(1,  user.getUser());
-			ps.setString(2,  convertirSHA256(user.getPassword()));
-			ps.setString(3,  user.getNombre());
+			ps.setString(1,  user.getMunicipio());
+			ps.setString(2,  user.getNombre());
+			ps.setString(3,  user.getCarrera());
+			ps.setInt(4,  user.getGrupo());
+			ps.setInt(5,  user.getId());
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {			
@@ -41,9 +43,10 @@ public class daoUsuario {
             while(rs.next()) {
             	Usuario u = new Usuario();
             	u.setId(rs.getInt("id"));
-            	u.setUser(rs.getString("user"));
-            	u.setPassword(rs.getString("password"));
+            	u.setCarrera(rs.getString("carrera"));
             	u.setNombre(rs.getString("nombre"));
+            	u.setGrupo(rs.getInt("grupo"));
+            	u.setMunicipio(rs.getString("nombre"));
             	lista.add(u);
             }
 		} catch (SQLException e) {
@@ -70,10 +73,11 @@ public class daoUsuario {
 		PreparedStatement ps=null;
 		try {
 			ps=cx.conectar().prepareStatement("UPDATE usuario SET user=?,password=?,nombre=? WHERE id=?");
-			ps.setString(1,  user.getUser());
-			ps.setString(2,  convertirSHA256(user.getPassword()));
-			ps.setString(3,  user.getNombre());
-			ps.setInt(4,user.getId());
+			ps.setString(1,  user.getMunicipio());
+			ps.setString(2,  user.getNombre());
+			ps.setInt(3,user.getId());
+			ps.setString(4,  user.getCarrera());
+			ps.setInt(5,  user.getGrupo());
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {			
@@ -83,22 +87,5 @@ public class daoUsuario {
 		
 	}
 	
-	public String convertirSHA256(String password) {
-		MessageDigest md=null;
-		try {
-			md=MessageDigest.getInstance("SHA-256");
-		}
-		catch(NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			return null;
-		}
-		byte[]hash =md.digest(password.getBytes());
-		StringBuffer sb=new StringBuffer();
-		
-		for(byte b:hash) {
-			sb.append(String.format("%02x", b));
-		}
-		
-		return sb.toString();
-	}
+	
 }

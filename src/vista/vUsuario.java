@@ -26,14 +26,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class vUsuario extends JFrame {
 
 	private JPanel contentPane;
 	int fila = -1;
 	private JTextField txtUser;
-	private JTextField txtPassword;
-	private JTextField txtNombre;
 	private JTable tblUsuarios;
 	private JLabel lblID;
 	private JButton btnAgregar;
@@ -45,6 +45,9 @@ public class vUsuario extends JFrame {
 	DefaultTableModel modelo = new DefaultTableModel();
 	ArrayList<Usuario> lista = new ArrayList<Usuario>();
 	Usuario usuario;
+	private JComboBox comboBox;
+	private JComboBox cboGrupo;
+	private JComboBox cboMunicipio;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -61,7 +64,7 @@ public class vUsuario extends JFrame {
 
 	public void limpiar() {
 		txtUser.setText("");
-		txtPassword.setText("");
+		txtCarrera.setText("");
 		txtNombre.setText("");
 	}
 	
@@ -69,7 +72,7 @@ public class vUsuario extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(vUsuario.class.getResource("/img/Java.jpg")));
 		setTitle("CRUD USUARIO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 566, 448);
+		setBounds(100, 100, 617, 448);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -78,56 +81,46 @@ public class vUsuario extends JFrame {
 
 		JLabel lblNewLabel = new JLabel("ID");
 		lblNewLabel.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblNewLabel.setBounds(25, 32, 46, 23);
+		lblNewLabel.setBounds(38, 11, 46, 23);
 		contentPane.add(lblNewLabel);
 
 		lblID = new JLabel("1");
 		lblID.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblID.setBounds(164, 40, 46, 14);
+		lblID.setBounds(164, 17, 46, 14);
 		contentPane.add(lblID);
 
-		JLabel lblNewLabel_1 = new JLabel("USUARIO");
+		JLabel lblNewLabel_1 = new JLabel("MUNICIPIO");
 		lblNewLabel_1.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblNewLabel_1.setBounds(25, 66, 86, 21);
+		lblNewLabel_1.setBounds(295, 130, 114, 21);
 		contentPane.add(lblNewLabel_1);
 
 		txtUser = new JTextField();
-		txtUser.setBounds(164, 67, 169, 20);
+		txtUser.setBounds(439, 14, 121, 25);
 		contentPane.add(txtUser);
 		txtUser.setColumns(10);
 
-		JLabel lblNewLabel_1_1 = new JLabel("PASSWORD");
+		JLabel lblNewLabel_1_1 = new JLabel("CARRERA");
 		lblNewLabel_1_1.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblNewLabel_1_1.setBounds(25, 100, 129, 23);
+		lblNewLabel_1_1.setBounds(37, 60, 129, 19);
 		contentPane.add(lblNewLabel_1_1);
-
-		txtPassword = new JTextField();
-		txtPassword.setColumns(10);
-		txtPassword.setBounds(164, 97, 169, 20);
-		contentPane.add(txtPassword);
 
 		JLabel lblNewLabel_1_2 = new JLabel("NOMBRE");
 		lblNewLabel_1_2.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblNewLabel_1_2.setBounds(25, 131, 86, 23);
+		lblNewLabel_1_2.setBounds(298, 16, 86, 23);
 		contentPane.add(lblNewLabel_1_2);
-
-		txtNombre = new JTextField();
-		txtNombre.setColumns(10);
-		txtNombre.setBounds(164, 136, 169, 20);
-		contentPane.add(txtNombre);
 
 		btnAgregar = new JButton("Agregar");
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtUser.getText().equals("") || txtPassword.getText().equals("")
+					if (txtUser.getText().equals("") || txtCarrera.getText().equals("")
 							|| txtNombre.getText().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
 					Usuario user = new Usuario();
 					user.setUser(txtUser.getText());
-					user.setPassword(txtPassword.getText());
+					user.setPassword(txtCarrera.getText());
 					user.setNombre(txtNombre.getText());
 					if (dao.insertarUsuario(user)) {
 						actualizarTabla();
@@ -144,20 +137,20 @@ public class vUsuario extends JFrame {
 		});
 		btnAgregar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnAgregar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnAgregar.setBounds(22, 187, 106, 23);
+		btnAgregar.setBounds(22, 187, 106, 31);
 		contentPane.add(btnAgregar);
 
 		btnEditar = new JButton("Editar");
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtUser.getText().equals("") || txtPassword.getText().equals("")
+					if (txtUser.getText().equals("") || txtCarrera.getText().equals("")
 							|| txtNombre.getText().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}					
 					usuario.setUser(txtUser.getText());
-					usuario.setPassword(txtPassword.getText());
+					usuario.setPassword(txtCarrera.getText());
 					usuario.setNombre(txtNombre.getText());
 					if (dao.editarUsuario(usuario)) {
 						actualizarTabla();
@@ -173,7 +166,7 @@ public class vUsuario extends JFrame {
 		});
 		btnEditar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEditar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEditar.setBounds(283, 187, 89, 23);
+		btnEditar.setBounds(308, 187, 89, 31);
 		contentPane.add(btnEditar);
 
 		btnEliminar = new JButton("Eliminar");
@@ -196,7 +189,7 @@ public class vUsuario extends JFrame {
 		});
 		btnEliminar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEliminar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEliminar.setBounds(159, 187, 103, 23);
+		btnEliminar.setBounds(159, 187, 103, 31);
 		contentPane.add(btnEliminar);
 
 		btnBorrar = new JButton("Borrar");
@@ -207,7 +200,7 @@ public class vUsuario extends JFrame {
 		});
 		btnBorrar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnBorrar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnBorrar.setBounds(404, 187, 89, 23);
+		btnBorrar.setBounds(429, 187, 89, 31);
 		contentPane.add(btnBorrar);
 
 		scrollPane = new JScrollPane();
@@ -216,7 +209,7 @@ public class vUsuario extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		scrollPane.setBounds(22, 240, 503, 158);
+		scrollPane.setBounds(22, 240, 556, 158);
 		contentPane.add(scrollPane);
 
 		tblUsuarios = new JTable();
@@ -227,7 +220,7 @@ public class vUsuario extends JFrame {
 				usuario=lista.get(fila);
 				lblID.setText("" + lista.get(fila).getId());
 				txtUser.setText(usuario.getUser());
-				txtPassword.setText(usuario.getPassword());
+				txtCarrera.setText(usuario.getPassword());
 				txtNombre.setText(usuario.getNombre());
 			}
 		});
@@ -241,6 +234,24 @@ public class vUsuario extends JFrame {
 		modelo.addColumn("PASSWORD");
 		modelo.addColumn("NOMBRE");
 		tblUsuarios.setModel(modelo);
+		
+		JLabel lblNewLabel_1_1_1 = new JLabel("GRUPO");
+		lblNewLabel_1_1_1.setFont(new Font("Nirmala UI", Font.BOLD, 19));
+		lblNewLabel_1_1_1.setBounds(303, 80, 94, 19);
+		contentPane.add(lblNewLabel_1_1_1);
+		
+		cboGrupo = new JComboBox();
+		cboGrupo.setBounds(439, 68, 121, 41);
+		contentPane.add(cboGrupo);
+		
+		cboMunicipio = new JComboBox();
+		cboMunicipio.setModel(new DefaultComboBoxModel(new String[] {"Ecatepec", "Tecamac", "Zumpango"}));
+		cboMunicipio.setBounds(439, 129, 121, 41);
+		contentPane.add(cboMunicipio);
+		
+		comboBox = new JComboBox();
+		comboBox.setBounds(22, 90, 144, 41);
+		contentPane.add(comboBox);
 		actualizarTabla();
 	}
 

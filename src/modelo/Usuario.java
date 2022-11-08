@@ -2,10 +2,11 @@ package modelo;
 
 public class Usuario {
 	int id;
-	String user;
-	String password;
+	String Municipio;
 	String nombre;
-
+	int Grupo;
+	String Carrera;
+	
 	public Usuario() {
 
 	}
@@ -18,20 +19,12 @@ public class Usuario {
 		this.id = id;
 	}
 
-	public String getUser() {
-		return user;
+	public String getMunicipio() {
+		return Municipio;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
+	public void setMunicipio(String municipio) {
+		Municipio = municipio;
 	}
 
 	public String getNombre() {
@@ -42,4 +35,21 @@ public class Usuario {
 		this.nombre = nombre;
 	}
 
+	public int getGrupo() {
+		return Grupo;
+	}
+
+	public void setGrupo(int grupo) {
+		Grupo = grupo;
+	}
+
+	public String getCarrera() {
+		return Carrera;
+	}
+
+	public void setCarrera(String carrera) {
+		Carrera = carrera;
+	}
+	
+	
 }
