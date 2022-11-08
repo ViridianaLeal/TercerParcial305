@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Toolkit;
 
 public class vUsuario extends JFrame {
 
@@ -43,6 +44,7 @@ public class vUsuario extends JFrame {
 	daoUsuario dao = new daoUsuario();
 	DefaultTableModel modelo = new DefaultTableModel();
 	ArrayList<Usuario> lista = new ArrayList<Usuario>();
+	Usuario usuario;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -57,10 +59,14 @@ public class vUsuario extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
+	public void limpiar() {
+		txtUser.setText("");
+		txtPassword.setText("");
+		txtNombre.setText("");
+	}
+	
 	public vUsuario() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(vUsuario.class.getResource("/img/Java.jpg")));
 		setTitle("CRUD USUARIO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 566, 448);
@@ -114,12 +120,18 @@ public class vUsuario extends JFrame {
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (txtUser.getText().equals("") || txtPassword.getText().equals("")
+							|| txtNombre.getText().equals("")) {
+						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
+						return;
+					}
 					Usuario user = new Usuario();
 					user.setUser(txtUser.getText());
 					user.setPassword(txtPassword.getText());
 					user.setNombre(txtNombre.getText());
 					if (dao.insertarUsuario(user)) {
 						actualizarTabla();
+						limpiar();
 						JOptionPane.showMessageDialog(null, "SE AGREGO CORRECTAMENTE");
 					} else {
 						JOptionPane.showMessageDialog(null, "ERROR");
@@ -136,6 +148,29 @@ public class vUsuario extends JFrame {
 		contentPane.add(btnAgregar);
 
 		btnEditar = new JButton("Editar");
+		btnEditar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if (txtUser.getText().equals("") || txtPassword.getText().equals("")
+							|| txtNombre.getText().equals("")) {
+						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
+						return;
+					}					
+					usuario.setUser(txtUser.getText());
+					usuario.setPassword(txtPassword.getText());
+					usuario.setNombre(txtNombre.getText());
+					if (dao.editarUsuario(usuario)) {
+						actualizarTabla();
+						limpiar();
+						JOptionPane.showMessageDialog(null, "SE ACTUALIZO  CORRECTAMENTE");
+					} else {
+						JOptionPane.showMessageDialog(null, "ERROR");
+					}
+				} catch (Exception e2) {
+					JOptionPane.showMessageDialog(null, "ERROR");
+				}
+			}
+		});
 		btnEditar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEditar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
 		btnEditar.setBounds(283, 187, 89, 23);
@@ -145,7 +180,7 @@ public class vUsuario extends JFrame {
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE USUARIO?");
+					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE USUARIO?","ELIMINAR USUARIO",JOptionPane.YES_NO_OPTION);
 					if (opcion == 0) {
 						if (dao.EliminarUsuario(lista.get(fila).getId())) {
 							actualizarTabla();
@@ -167,9 +202,7 @@ public class vUsuario extends JFrame {
 		btnBorrar = new JButton("Borrar");
 		btnBorrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				txtNombre.setText(null);
-				txtPassword.setText(null);
-				txtUser.setText(null);
+				limpiar();
 			}
 		});
 		btnBorrar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
@@ -190,8 +223,12 @@ public class vUsuario extends JFrame {
 		tblUsuarios.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				fila = tblUsuarios.getSelectedRow();
+				fila = tblUsuarios.getSelectedRow();	
+				usuario=lista.get(fila);
 				lblID.setText("" + lista.get(fila).getId());
+				txtUser.setText(usuario.getUser());
+				txtPassword.setText(usuario.getPassword());
+				txtNombre.setText(usuario.getNombre());
 			}
 		});
 		tblUsuarios.setModel(new DefaultTableModel(
@@ -204,6 +241,7 @@ public class vUsuario extends JFrame {
 		modelo.addColumn("PASSWORD");
 		modelo.addColumn("NOMBRE");
 		tblUsuarios.setModel(modelo);
+		actualizarTabla();
 	}
 
 	public void actualizarTabla() {
