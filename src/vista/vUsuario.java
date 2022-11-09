@@ -63,6 +63,7 @@ public class vUsuario extends JFrame {
 		txtUser.setText("");
 		txtPassword.setText("");
 		txtNombre.setText("");
+		lblID.setText("");
 	}
 
 	public vUsuario() {
