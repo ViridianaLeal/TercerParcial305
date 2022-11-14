@@ -72,7 +72,6 @@ public class Alumno {
 	public void setMunicipio(String municipio) {
 		this.municipio = municipio;
 	}
-	
-	
+
 
 }

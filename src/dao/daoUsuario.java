@@ -49,6 +49,7 @@ public class daoUsuario {
 		}
 		return lista;
 	}
+	
 	public boolean EliminarUsuario(int Id) {
 		PreparedStatement ps=null;
 		try {
