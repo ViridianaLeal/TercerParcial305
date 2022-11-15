@@ -58,6 +58,8 @@ public class daoAlumno {
 		return lista;
 	}
 	
+	
+	
 	public boolean EliminarAlumno(int Id) {
 		PreparedStatement ps=null;
 		try {
