@@ -16,7 +16,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import dao.daoComentario;
 import dao.daoUsuario;
+import modelo.Comentario;
 import modelo.Usuario;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -25,13 +28,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
 
-public class vUsuario extends JFrame {
+public class vComentario extends JFrame {
 
 	private JPanel contentPane;
 	int fila = -1;
 	private JTextField txtUser;
-	private JTextField txtPassword;
-	private JTextField txtNombre;
 	private JTable tblUsuarios;
 	private JLabel lblID;
 	private JButton btnAgregar;
@@ -39,16 +40,17 @@ public class vUsuario extends JFrame {
 	private JButton btnEditar;
 	private JButton btnBorrar;
 	private JScrollPane scrollPane;
-	daoUsuario dao = new daoUsuario();
+	daoComentario dao = new daoComentario();
 	DefaultTableModel modelo = new DefaultTableModel();
-	ArrayList<Usuario> lista = new ArrayList<Usuario>();
-	Usuario usuario;
+	ArrayList<Comentario> lista = new ArrayList<Comentario>();
+	Comentario comentario;
+	private JTextField txtTexto;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					vUsuario frame = new vUsuario();
+					vComentario frame = new vComentario();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -62,16 +64,15 @@ public class vUsuario extends JFrame {
 	 */
 	public void limpiar() {
 		txtUser.setText("");
-		txtPassword.setText("");
-		txtNombre.setText("");
+		txtTexto.setText("");
 		lblID.setText("");
 	}
 
-	public vUsuario() {
+	public vComentario() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(vUsuario.class.getResource("/img/Java.jpg")));
 		setTitle("CRUD USUARIO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 566, 448);
+		setBounds(100, 100, 566, 420);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -93,36 +94,22 @@ public class vUsuario extends JFrame {
 		txtUser.setBounds(164, 67, 169, 20);
 		contentPane.add(txtUser);
 		txtUser.setColumns(10);
-		JLabel lblNewLabel_1_1 = new JLabel("PASSWORD");
+		JLabel lblNewLabel_1_1 = new JLabel("TEXTO");
 		lblNewLabel_1_1.setFont(new Font("Nirmala UI", Font.BOLD, 19));
 		lblNewLabel_1_1.setBounds(25, 100, 129, 23);
 		contentPane.add(lblNewLabel_1_1);
-		txtPassword = new JTextField();
-		txtPassword.setColumns(10);
-		txtPassword.setBounds(164, 97, 169, 20);
-		contentPane.add(txtPassword);
-		JLabel lblNewLabel_1_2 = new JLabel("NOMBRE");
-		lblNewLabel_1_2.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblNewLabel_1_2.setBounds(25, 131, 86, 23);
-		contentPane.add(lblNewLabel_1_2);
-		txtNombre = new JTextField();
-		txtNombre.setColumns(10);
-		txtNombre.setBounds(164, 136, 169, 20);
-		contentPane.add(txtNombre);
 		btnAgregar = new JButton("Agregar");
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtUser.getText().equals("") || txtPassword.getText().equals("")
-							|| txtNombre.getText().equals("")) {
+					if (txtUser.getText().equals("") || txtTexto.getText().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
-					Usuario user = new Usuario();
-					user.setUser(txtUser.getText());
-					user.setPassword(txtPassword.getText());
-					user.setNombre(txtNombre.getText());
-					if (dao.insertarUsuario(user)) {
+					Comentario user = new Comentario();
+					user.setUsuario(txtUser.getText());
+					user.setTexto(txtTexto.getText());
+					if (dao.insertarComentario(user)) {
 						actualizarTabla();
 						limpiar();
 						JOptionPane.showMessageDialog(null, "SE AGREGO CORRECTAMENTE");
@@ -136,22 +123,20 @@ public class vUsuario extends JFrame {
 		});
 		btnAgregar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnAgregar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnAgregar.setBounds(22, 187, 106, 23);
+		btnAgregar.setBounds(78, 153, 106, 23);
 		contentPane.add(btnAgregar);
 
 		btnEditar = new JButton("Editar");
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtUser.getText().equals("") || txtPassword.getText().equals("")
-							|| txtNombre.getText().equals("")) {
+					if (txtUser.getText().equals("") || txtTexto.getText().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
-					usuario.setUser(txtUser.getText());
-					usuario.setPassword(txtPassword.getText());
-					usuario.setNombre(txtNombre.getText());
-					if (dao.editarUsuario(usuario)) {
+					comentario.setUsuario(txtUser.getText());
+					comentario.setTexto(txtTexto.getText());
+					if (dao.editarComentario(comentario)) {
 						actualizarTabla();
 						limpiar();
 						JOptionPane.showMessageDialog(null, "SE ACTUALIZO  CORRECTAMENTE");
@@ -165,16 +150,17 @@ public class vUsuario extends JFrame {
 		});
 		btnEditar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEditar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEditar.setBounds(283, 187, 89, 23);
+		btnEditar.setBounds(316, 153, 89, 23);
 		contentPane.add(btnEditar);
 		btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					
-					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE USUARIO?","ELIMINAR USUARIO", JOptionPane.YES_NO_OPTION);
+
+					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE COMNETARIO?",
+							"ELIMINAR COMENTARIO", JOptionPane.YES_NO_OPTION);
 					if (opcion == 0) {
-						if (dao.EliminarUsuario(lista.get(fila).getId())) {
+						if (dao.EliminarComentario(lista.get(fila).getId())) {
 							actualizarTabla();
 							JOptionPane.showMessageDialog(null, "SE ELIMINO CORRECTAMENTE");
 						} else {
@@ -188,21 +174,20 @@ public class vUsuario extends JFrame {
 		});
 		btnEliminar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEliminar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEliminar.setBounds(159, 187, 103, 23);
+		btnEliminar.setBounds(199, 153, 103, 23);
 		contentPane.add(btnEliminar);
-		btnBorrar = new JButton("Borrar");
+		btnBorrar = new JButton("Limpiar");
 		btnBorrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				lblID.setText("");
-				txtNombre.setText(null);
-				txtPassword.setText(null);
 				txtUser.setText(null);
+				txtTexto.setText(null);
 				limpiar();
 			}
 		});
 		btnBorrar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnBorrar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnBorrar.setBounds(404, 187, 89, 23);
+		btnBorrar.setBounds(417, 153, 89, 23);
 		contentPane.add(btnBorrar);
 		scrollPane = new JScrollPane();
 		scrollPane.addMouseListener(new MouseAdapter() {
@@ -210,7 +195,7 @@ public class vUsuario extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		scrollPane.setBounds(22, 240, 503, 158);
+		scrollPane.setBounds(25, 203, 503, 158);
 		contentPane.add(scrollPane);
 		tblUsuarios = new JTable();
 		tblUsuarios.addMouseListener(new MouseAdapter() {
@@ -218,11 +203,10 @@ public class vUsuario extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				fila = tblUsuarios.getSelectedRow();
 				fila = tblUsuarios.getSelectedRow();
-				usuario = lista.get(fila);
+				comentario = lista.get(fila);
 				lblID.setText("" + lista.get(fila).getId());
-				txtUser.setText(usuario.getUser());
-				txtPassword.setText(usuario.getPassword());
-				txtNombre.setText(usuario.getNombre());
+				txtUser.setText(comentario.getUsuario());
+				txtTexto.setText(comentario.getTexto());
 			}
 		});
 		tblUsuarios.setModel(new DefaultTableModel(
@@ -230,10 +214,14 @@ public class vUsuario extends JFrame {
 				new String[] { "New column", "New column", "New column", "New column" }));
 		scrollPane.setViewportView(tblUsuarios);
 		modelo.addColumn("ID");
-		modelo.addColumn("USER");
-		modelo.addColumn("PASSWORD");
-		modelo.addColumn("NOMBRE");
+		modelo.addColumn("USUARIO");
+		modelo.addColumn("TEXTO");
 		tblUsuarios.setModel(modelo);
+
+		txtTexto = new JTextField();
+		txtTexto.setBounds(162, 98, 344, 20);
+		contentPane.add(txtTexto);
+		txtTexto.setColumns(10);
 		actualizarTabla();
 	}
 
@@ -241,13 +229,12 @@ public class vUsuario extends JFrame {
 		while (modelo.getRowCount() > 0) {
 			modelo.removeRow(0);
 		}
-		lista = dao.fetchUsuarios();
-		for (Usuario u : lista) {
-			Object o[] = new Object[4];
+		lista = dao.fetchComentarios();
+		for (Comentario u : lista) {
+			Object o[] = new Object[3];
 			o[0] = u.getId();
-			o[1] = u.getUser();
-			o[2] = u.getPassword();
-			o[3] = u.getNombre();
+			o[1] = u.getUsuario();
+			o[2] = u.getTexto();
 			modelo.addRow(o);
 		}
 		tblUsuarios.setModel(modelo);
