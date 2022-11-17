@@ -16,7 +16,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
 import dao.daoComentario;
 import dao.daoUsuario;
 import modelo.Comentario;
@@ -31,8 +30,8 @@ import java.awt.Toolkit;
 public class vComentario extends JFrame {
 
 	private JPanel contentPane;
-	int fila = -1;
-	private JTextField txtUser;
+	private JTextField txtUsuario;
+	private JTextField txtTexto;
 	private JTable tblUsuarios;
 	private JLabel lblID;
 	private JButton btnAgregar;
@@ -44,7 +43,7 @@ public class vComentario extends JFrame {
 	DefaultTableModel modelo = new DefaultTableModel();
 	ArrayList<Comentario> lista = new ArrayList<Comentario>();
 	Comentario comentario;
-	private JTextField txtTexto;
+	int fila = -1;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -59,20 +58,17 @@ public class vComentario extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public void limpiar() {
-		txtUser.setText("");
+		txtUsuario.setText("");
 		txtTexto.setText("");
 		lblID.setText("");
 	}
 
 	public vComentario() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(vUsuario.class.getResource("/img/Java.jpg")));
-		setTitle("CRUD USUARIO");
+		setTitle("CRUD COMENTARIO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 566, 420);
+		setBounds(100, 100, 566, 448);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -90,24 +86,28 @@ public class vComentario extends JFrame {
 		lblNewLabel_1.setFont(new Font("Nirmala UI", Font.BOLD, 19));
 		lblNewLabel_1.setBounds(25, 66, 86, 21);
 		contentPane.add(lblNewLabel_1);
-		txtUser = new JTextField();
-		txtUser.setBounds(164, 67, 169, 20);
-		contentPane.add(txtUser);
-		txtUser.setColumns(10);
+		txtUsuario = new JTextField();
+		txtUsuario.setBounds(164, 67, 169, 20);
+		contentPane.add(txtUsuario);
+		txtUsuario.setColumns(10);
 		JLabel lblNewLabel_1_1 = new JLabel("TEXTO");
 		lblNewLabel_1_1.setFont(new Font("Nirmala UI", Font.BOLD, 19));
 		lblNewLabel_1_1.setBounds(25, 100, 129, 23);
 		contentPane.add(lblNewLabel_1_1);
+		txtTexto = new JTextField();
+		txtTexto.setColumns(10);
+		txtTexto.setBounds(164, 97, 169, 20);
+		contentPane.add(txtTexto);
 		btnAgregar = new JButton("Agregar");
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtUser.getText().equals("") || txtTexto.getText().equals("")) {
+					if (txtUsuario.getText().equals("") || txtTexto.getText().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
 					Comentario user = new Comentario();
-					user.setUsuario(txtUser.getText());
+					user.setUsuario(txtUsuario.getText());
 					user.setTexto(txtTexto.getText());
 					if (dao.insertarComentario(user)) {
 						actualizarTabla();
@@ -123,18 +123,18 @@ public class vComentario extends JFrame {
 		});
 		btnAgregar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnAgregar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnAgregar.setBounds(78, 153, 106, 23);
+		btnAgregar.setBounds(22, 187, 106, 23);
 		contentPane.add(btnAgregar);
 
 		btnEditar = new JButton("Editar");
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtUser.getText().equals("") || txtTexto.getText().equals("")) {
+					if (txtUsuario.getText().equals("") || txtTexto.getText().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
-					comentario.setUsuario(txtUser.getText());
+					comentario.setUsuario(txtUsuario.getText());
 					comentario.setTexto(txtTexto.getText());
 					if (dao.editarComentario(comentario)) {
 						actualizarTabla();
@@ -150,14 +150,14 @@ public class vComentario extends JFrame {
 		});
 		btnEditar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEditar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEditar.setBounds(316, 153, 89, 23);
+		btnEditar.setBounds(283, 187, 89, 23);
 		contentPane.add(btnEditar);
 		btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 
-					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE COMNETARIO?",
+					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE COMENTARIO?",
 							"ELIMINAR COMENTARIO", JOptionPane.YES_NO_OPTION);
 					if (opcion == 0) {
 						if (dao.EliminarComentario(lista.get(fila).getId())) {
@@ -174,20 +174,20 @@ public class vComentario extends JFrame {
 		});
 		btnEliminar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEliminar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEliminar.setBounds(199, 153, 103, 23);
+		btnEliminar.setBounds(159, 187, 103, 23);
 		contentPane.add(btnEliminar);
-		btnBorrar = new JButton("Limpiar");
+		btnBorrar = new JButton("Borrar");
 		btnBorrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				lblID.setText("");
-				txtUser.setText(null);
 				txtTexto.setText(null);
+				txtUsuario.setText(null);
 				limpiar();
 			}
 		});
 		btnBorrar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnBorrar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnBorrar.setBounds(417, 153, 89, 23);
+		btnBorrar.setBounds(404, 187, 89, 23);
 		contentPane.add(btnBorrar);
 		scrollPane = new JScrollPane();
 		scrollPane.addMouseListener(new MouseAdapter() {
@@ -195,7 +195,7 @@ public class vComentario extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		scrollPane.setBounds(25, 203, 503, 158);
+		scrollPane.setBounds(22, 240, 503, 158);
 		contentPane.add(scrollPane);
 		tblUsuarios = new JTable();
 		tblUsuarios.addMouseListener(new MouseAdapter() {
@@ -205,7 +205,7 @@ public class vComentario extends JFrame {
 				fila = tblUsuarios.getSelectedRow();
 				comentario = lista.get(fila);
 				lblID.setText("" + lista.get(fila).getId());
-				txtUser.setText(comentario.getUsuario());
+				txtUsuario.setText(comentario.getUsuario());
 				txtTexto.setText(comentario.getTexto());
 			}
 		});
@@ -217,11 +217,6 @@ public class vComentario extends JFrame {
 		modelo.addColumn("USUARIO");
 		modelo.addColumn("TEXTO");
 		tblUsuarios.setModel(modelo);
-
-		txtTexto = new JTextField();
-		txtTexto.setBounds(162, 98, 344, 20);
-		contentPane.add(txtTexto);
-		txtTexto.setColumns(10);
 		actualizarTabla();
 	}
 
