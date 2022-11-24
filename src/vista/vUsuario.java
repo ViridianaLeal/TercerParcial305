@@ -1,6 +1,7 @@
 package vista;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -16,6 +17,19 @@ import javax.swing.border.BevelBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import dao.daoUsuario;
 import modelo.Usuario;
 import java.awt.event.ActionListener;
@@ -23,11 +37,16 @@ import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.awt.Toolkit;
 
 public class vUsuario extends JFrame {
 
-	private JPanel contentPane;	
+	private JPanel contentPane;
 	private JTextField txtUser;
 	private JTextField txtPassword;
 	private JTextField txtNombre;
@@ -36,13 +55,13 @@ public class vUsuario extends JFrame {
 	private JButton btnAgregar;
 	private JButton btnEliminar;
 	private JButton btnEditar;
-	private JButton btnBorrar;
 	private JScrollPane scrollPane;
 	daoUsuario dao = new daoUsuario();
 	DefaultTableModel modelo = new DefaultTableModel();
 	ArrayList<Usuario> lista = new ArrayList<Usuario>();
 	Usuario usuario;
 	int fila = -1;
+	private JButton btnPdf;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -71,7 +90,7 @@ public class vUsuario extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(vUsuario.class.getResource("/img/Java.jpg")));
 		setTitle("CRUD USUARIO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 566, 448);
+		setBounds(100, 100, 566, 394);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -136,7 +155,7 @@ public class vUsuario extends JFrame {
 		});
 		btnAgregar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnAgregar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnAgregar.setBounds(22, 187, 106, 23);
+		btnAgregar.setBounds(404, 34, 106, 23);
 		contentPane.add(btnAgregar);
 
 		btnEditar = new JButton("Editar");
@@ -165,17 +184,19 @@ public class vUsuario extends JFrame {
 		});
 		btnEditar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEditar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEditar.setBounds(283, 187, 89, 23);
+		btnEditar.setBounds(404, 102, 106, 23);
 		contentPane.add(btnEditar);
 		btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					
-					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE USUARIO?","ELIMINAR USUARIO", JOptionPane.YES_NO_OPTION);
+
+					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE USUARIO?",
+							"ELIMINAR USUARIO", JOptionPane.YES_NO_OPTION);
 					if (opcion == 0) {
 						if (dao.EliminarUsuario(lista.get(fila).getId())) {
 							actualizarTabla();
+							limpiar();
 							JOptionPane.showMessageDialog(null, "SE ELIMINO CORRECTAMENTE");
 						} else {
 							JOptionPane.showMessageDialog(null, "ERROR");
@@ -188,29 +209,15 @@ public class vUsuario extends JFrame {
 		});
 		btnEliminar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEliminar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEliminar.setBounds(159, 187, 103, 23);
+		btnEliminar.setBounds(404, 67, 106, 23);
 		contentPane.add(btnEliminar);
-		btnBorrar = new JButton("Borrar");
-		btnBorrar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				lblID.setText("");
-				txtNombre.setText(null);
-				txtPassword.setText(null);
-				txtUser.setText(null);
-				limpiar();
-			}
-		});
-		btnBorrar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-		btnBorrar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnBorrar.setBounds(404, 187, 89, 23);
-		contentPane.add(btnBorrar);
 		scrollPane = new JScrollPane();
 		scrollPane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		scrollPane.setBounds(22, 240, 503, 158);
+		scrollPane.setBounds(25, 176, 503, 158);
 		contentPane.add(scrollPane);
 		tblUsuarios = new JTable();
 		tblUsuarios.addMouseListener(new MouseAdapter() {
@@ -234,6 +241,81 @@ public class vUsuario extends JFrame {
 		modelo.addColumn("PASSWORD");
 		modelo.addColumn("NOMBRE");
 		tblUsuarios.setModel(modelo);
+
+		btnPdf = new JButton("PDF");
+		btnPdf.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					FileOutputStream archivo;
+					File file = new File(
+							"C:\\Users\\VIRI\\Desktop\\Repositorios\\TercerParcial305\\src\\PDF\\reporte.pdf");
+					archivo = new FileOutputStream(file);
+					Document doc = new Document();
+					PdfWriter.getInstance(doc, archivo);
+					doc.open();
+					Image img = Image.getInstance(
+							"C:\\Users\\VIRI\\Desktop\\Repositorios\\TercerParcial305\\src\\img\\jyujyu.png");
+					img.setAlignment(Element.ALIGN_CENTER);
+					img.scaleToFit(100, 100);
+					doc.add(img);
+					Paragraph p = new Paragraph(10);
+					com.itextpdf.text.Font negrita = new com.itextpdf.text.Font(
+							com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD, BaseColor.BLACK);
+					p.add(Chunk.NEWLINE);
+					p.add("CATALOGO DE USUARIOS");
+					p.add(Chunk.NEWLINE);
+					p.add(Chunk.NEWLINE);
+					p.setAlignment(Element.ALIGN_CENTER);
+					doc.add(p);
+					PdfPTable tabla = new PdfPTable(4);
+					tabla.setWidthPercentage(100);
+					PdfPCell c1 = new PdfPCell(new Phrase(" ID USUARIO", negrita));
+					PdfPCell c2 = new PdfPCell(new Phrase(" USUARIO", negrita));
+					PdfPCell c3 = new PdfPCell(new Phrase(" PASSWORD", negrita));
+					PdfPCell c4 = new PdfPCell(new Phrase(" NOMBRE", negrita));
+					c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+					c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+					c3.setHorizontalAlignment(Element.ALIGN_CENTER);
+					c4.setHorizontalAlignment(Element.ALIGN_CENTER);
+					c1.setBackgroundColor(BaseColor.GRAY);
+					c2.setBackgroundColor(BaseColor.LIGHT_GRAY);
+					c3.setBackgroundColor(BaseColor.LIGHT_GRAY);
+					c4.setBackgroundColor(BaseColor.LIGHT_GRAY);
+					tabla.addCell(c1);
+					tabla.addCell(c2);
+					tabla.addCell(c3);
+					tabla.addCell(c4);
+
+					for (Usuario u : lista) {
+						tabla.addCell("" + u.getId());
+						tabla.addCell(u.getUser());
+						tabla.addCell(u.getPassword());
+						tabla.addCell(u.getNombre());
+
+					}
+
+					doc.add(tabla);
+					Paragraph p1 = new Paragraph(10);
+					p1.add(Chunk.NEWLINE);
+					p1.add("NÚMERO DE REGISTRO " + lista.size());
+					p1.add(Chunk.NEWLINE);
+					p1.add(Chunk.NEWLINE);
+					p1.setAlignment(Element.ALIGN_RIGHT);
+					doc.add(p1);
+					doc.close();
+					archivo.close();
+					Desktop.getDesktop().open(file);
+				} catch (FileNotFoundException e1) {
+					JOptionPane.showMessageDialog(null, "ERROR AL CREAR ARCHIVO");					
+				} catch (DocumentException e1) {
+					JOptionPane.showMessageDialog(null, "ERROR AL CREAR DOCUMENTO PDF");				
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(null, "ERROR AL CREAR IO");
+				}
+			}
+		});
+		btnPdf.setBounds(414, 135, 89, 23);
+		contentPane.add(btnPdf);
 		actualizarTabla();
 	}
 
